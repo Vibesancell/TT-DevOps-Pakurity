@@ -3,7 +3,7 @@ name: Deploy infrastructure
 on:
   push:
     branches:
-      - "*"
+      - feature/terraform-ci/cd
     # paths:
     #   - terraform/**
 
