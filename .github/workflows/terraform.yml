@@ -3,12 +3,15 @@ name: Deploy infrastructure
 on:
   push:
     branches:
-      - feature/terraform-ci/cd
-    # paths:
-    #   - terraform/**
+      - main
+    paths:
+      - 'terraform/**'
+  pull_request:
+    paths:
+      - 'terraform/**'
 
 jobs:
-  run:
+  terraform:
     name: Deploy Infra
     permissions:
       id-token: write
@@ -17,6 +20,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          path: terraform  # Ограничиваем загрузку только папкой terraform
 
       - name: Auth in GCP
         id: auth
@@ -40,13 +45,21 @@ jobs:
         working-directory: ./terraform/envs/prod
 
       - name: Terraform Plan
+        id: plan
         run: terraform plan -out=plan.tfplan
         working-directory: ./terraform/envs/prod
 
-      # - name: Terraform Apply
-      #   run: terraform apply -auto-approve plan.tfplan
-      #   working-directory: ./terraform
+      - name: Upload Terraform plan
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-plan-${{ github.sha[0,7] }}
+          path: ./terraform/envs/prod/plan.tfplan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve plan.tfplan
+        working-directory: ./terraform/envs/prod
 
       - name: Clean up plan file
         run: rm -f plan.tfplan
-        working-directory: ./terraform
+        working-directory: ./terraform/envs/prod
