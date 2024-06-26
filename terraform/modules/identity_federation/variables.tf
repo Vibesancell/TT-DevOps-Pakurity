@@ -22,3 +22,8 @@ variable "description" {
   type = string
   description = "Description application"
 }
+
+variable "roles" {
+  type = list(string)
+  description = "List roles"
+}

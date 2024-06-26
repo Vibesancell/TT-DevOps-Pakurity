@@ -1,0 +1,65 @@
+name: Deploy infrastructure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/**'
+  pull_request:
+    paths:
+      - 'terraform/**'
+
+jobs:
+  terraform:
+    name: Deploy Infra
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          path: terraform  # Ограничиваем загрузку только папкой terraform
+
+      - name: Auth in GCP
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          token_format: "access_token"
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER_NAME }}
+          service_account: ${{ secrets.GCP_WORKLOAD_IDENTITY_SA_EMAIL }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.6.3
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./terraform/envs/prod
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ./terraform/envs/prod
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -out=plan.tfplan
+        working-directory: ./terraform/envs/prod
+
+      - name: Upload Terraform plan
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-plan-${{ github.sha[0,7] }}
+          path: ./terraform/envs/prod/plan.tfplan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve plan.tfplan
+        working-directory: ./terraform/envs/prod
+
+      - name: Clean up plan file
+        run: rm -f plan.tfplan
+        working-directory: ./terraform/envs/prod

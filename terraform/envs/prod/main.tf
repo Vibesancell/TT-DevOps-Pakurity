@@ -29,4 +29,5 @@ module "identity_federation" {
   account_id   = "tt-devops-sa"
   display_name = "tt-devops"
   description  = "tt-devops github action role"
+  roles = ["roles/storage.objectCreator", "roles/storage.objectViewer", "roles/storage.objectAdmin", "roles/iam.serviceAccountUser", "roles/iam.serviceAccountAdmin", "roles/iam.workloadIdentityPoolAdmin"]
 }
