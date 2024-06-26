@@ -20,8 +20,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        with:
-          path: terraform  # Ограничиваем загрузку только папкой terraform
 
       - name: Auth in GCP
         id: auth
