@@ -1,26 +1,52 @@
-name: "Example Workload Identity"
+name: Deploy infrastructure
 
 on:
   push:
     branches:
-      - "main"
+      - "*"
+    # paths:
+    #   - terraform/**
 
 jobs:
   run:
-    name: "Workload Identity Job"
+    name: Deploy Infra
     permissions:
       id-token: write
       contents: read
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-latest
     steps:
-      - name: "Auth in GCP"
-        id: "auth"
-        uses: "google-github-actions/auth@v1"
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Auth in GCP
+        id: auth
+        uses: google-github-actions/auth@v1
         with:
           token_format: "access_token"
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER_NAME }}
           service_account: ${{ secrets.GCP_WORKLOAD_IDENTITY_SA_EMAIL }}
 
-      - name: "Docker login"
-        run: |
-          echo '${{ steps.auth.outputs.access_token }}' | docker login -u oauth2accesstoken --password-stdin https://gcr.io
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.6.3
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./terraform
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ./terraform
+
+      - name: Terraform Plan
+        run: terraform plan -out=plan.tfplan
+        working-directory: ./terraform
+
+      # - name: Terraform Apply
+      #   run: terraform apply -auto-approve plan.tfplan
+      #   working-directory: ./terraform
+
+      - name: Clean up plan file
+        run: rm -f plan.tfplan
+        working-directory: ./terraform
