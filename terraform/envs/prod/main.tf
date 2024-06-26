@@ -29,5 +29,21 @@ module "identity_federation" {
   account_id   = "tt-devops-sa"
   display_name = "tt-devops"
   description  = "tt-devops github action role"
-  roles = ["roles/storage.objectCreator", "roles/storage.objectViewer", "roles/storage.objectAdmin", "roles/iam.serviceAccountUser", "roles/iam.serviceAccountAdmin", "roles/iam.workloadIdentityPoolAdmin"]
+  roles = [ "roles/storage.objectCreator", 
+            "roles/storage.objectViewer",
+            "roles/storage.objectAdmin",
+            "roles/iam.serviceAccountUser",
+            "roles/iam.serviceAccountAdmin",
+            "roles/iam.workloadIdentityPoolAdmin"
+          ]
+}
+
+module "big_query" {
+  source = "../../modules/big_query"
+
+  table_id = "${local.environment}_${local.app_name}_table"
+  project_id = local.project
+  dataset_id = "${local.environment}_${local.app_name}_dataset"
+  region = "US"
+  dataset_location = local.zone
 }
