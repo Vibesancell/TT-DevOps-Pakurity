@@ -34,7 +34,8 @@ module "identity_federation" {
             "roles/storage.objectAdmin",
             "roles/iam.serviceAccountUser",
             "roles/iam.serviceAccountAdmin",
-            "roles/iam.workloadIdentityPoolAdmin"
+            "roles/iam.workloadIdentityPoolAdmin",
+            "roles/iam.workloadIdentityUser"
           ]
 }
 
