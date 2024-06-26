@@ -41,3 +41,9 @@ resource "google_service_account_iam_member" "wif_sa" {
   member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_actions.name}/*"
 }
 
+resource "google_project_iam_member" "this" {
+  for_each = toset(var.roles)
+  project = var.project
+  member  = "serviceAccount:${google_service_account.tt_devops.email}"
+  role    = each.value
+}
