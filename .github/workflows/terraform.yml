@@ -3,12 +3,12 @@ name: Deploy infrastructure
 on:
   push:
     branches:
-      - main
-    paths:
-      - 'terraform/**'
-  pull_request:
-    paths:
-      - 'terraform/**'
+      - feature/terraform-scripts
+  #   paths:
+  #     - 'terraform/**'
+  # pull_request:
+  #   paths:
+  #     - 'terraform/**'
 
 jobs:
   terraform:
@@ -34,6 +34,11 @@ jobs:
         with:
           terraform_version: 1.6.3
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12' 
+
       - name: Terraform Init
         run: terraform init
         working-directory: ./terraform/envs/prod
@@ -54,7 +59,7 @@ jobs:
           path: ./terraform/envs/prod/plan.tfplan
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
+        # if: github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve plan.tfplan
         working-directory: ./terraform/envs/prod
 

@@ -19,6 +19,19 @@ provider "google" {
   zone        = local.zone
 }
 
+###### Create null_recource for auto field table ######
+resource "null_resource" "big_query" {
+  provisioner "local-exec" {
+    working_dir = "${path.module}/../../modules/big_query/script"
+    command     = "python3 -m venv venv && source venv/bin/activate && pip install google-cloud-bigquery google-auth && python3 insert_rows.py"
+    interpreter = ["bash", "-c"]
+  }
+
+  triggers = {
+    rerun_every_time = timestamp()
+  }
+}
+
 ###### Create custom modules ######
 module "identity_federation" {
   source = "../../modules/identity_federation"
