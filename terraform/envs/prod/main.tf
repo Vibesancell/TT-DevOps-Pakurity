@@ -44,6 +44,6 @@ module "big_query" {
   table_id = "${local.environment}_${local.app_name}_table"
   project_id = local.project
   dataset_id = "${local.environment}_${local.app_name}_dataset"
-  region = "US"
-  dataset_location = local.zone
+  region = local.region
+  dataset_location = "US"
 }
