@@ -20,8 +20,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        with:
-          path: terraform  # Ограничиваем загрузку только папкой terraform
 
       - name: Auth in GCP
         id: auth
@@ -52,7 +50,7 @@ jobs:
       - name: Upload Terraform plan
         uses: actions/upload-artifact@v3
         with:
-          name: terraform-plan-${{ github.sha }}
+          name: terraform-plan-${{ github.sha[0,7] }}
           path: ./terraform/envs/prod/plan.tfplan
 
       - name: Terraform Apply
