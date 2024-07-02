@@ -41,11 +41,14 @@ resource "google_service_account_iam_member" "wif_sa" {
   member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_actions.name}/*"
 }
 
-resource "google_service_account_iam_member" "sa_member" {
-  service_account_id = "projects/${var.project}/serviceAccounts/${google_service_account.tt_devops.email}"
-  role               = "roles/iam.serviceAccountTokenCreator"
-  member             = "serviceAccount:${google_service_account.tt_devops.email}"
+resource "google_project_iam_binding" "sa_iam" {
+  project = var.project
+  role    = "roles/iam.serviceAccountTokenCreator"
+  members = [
+    "serviceAccount:${google_service_account.deployer.email}",
+  ]
 }
+
 
 resource "google_project_iam_member" "this" {
   for_each = toset(var.roles)
