@@ -35,7 +35,8 @@ module "identity_federation" {
             "roles/iam.serviceAccountUser",
             "roles/iam.serviceAccountAdmin",
             "roles/iam.workloadIdentityPoolAdmin",
-            "roles/iam.workloadIdentityUser"
+            "roles/iam.workloadIdentityUser",
+            "roles/iam.serviceAccountTokenCreator"
           ]
 }
 
