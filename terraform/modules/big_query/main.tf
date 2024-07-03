@@ -27,3 +27,22 @@ resource "google_bigquery_table" "table" {
 ]
 EOF
 }
+
+# Create BigQuery view
+resource "google_bigquery_table" "view" {
+  dataset_id = google_bigquery_dataset.dataset.dataset_id
+  table_id   = var.view_id
+
+  view {
+    query          = <<EOF
+    SELECT 
+      Tag,
+      SUM(Count) as total_count
+    FROM 
+      `${var.project_id}.${var.dataset_id}.${var.table_id}`
+    GROUP BY 
+      Tag
+    EOF
+    use_legacy_sql = false
+  }
+}
