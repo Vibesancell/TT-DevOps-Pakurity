@@ -1,8 +1,25 @@
 from google.cloud import bigquery
 import random
 import string
+import google.auth
+import google.auth.impersonated_credentials
 
-client = bigquery.Client()
+# Impersonate a service account
+target_scopes = ["https://www.googleapis.com/auth/bigquery"]
+creds, pid = google.auth.default()
+print(f"Obtained default credentials for the project {pid}")
+
+# Replace with the email of the target service account you want to impersonate
+target_service_account_email = "tt-devops-sa@tt-devops-427513.iam.gserviceaccount.com"
+
+tcreds = google.auth.impersonated_credentials.Credentials(
+    source_credentials=creds,
+    target_principal=target_service_account_email,
+    target_scopes=target_scopes,
+)
+
+# Create BigQuery client with impersonated credentials
+client = bigquery.Client(credentials=tcreds)
 
 # Name dataset and table
 dataset_id = 'prod_tt_devops_dataset'
