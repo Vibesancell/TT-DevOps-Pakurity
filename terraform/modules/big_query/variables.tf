@@ -22,3 +22,7 @@ variable "table_id" {
   description = "The ID of the BigQuery table."
   type        = string
 }
+
+variable "view_id" {
+  description = "The ID of the BigQuery table view"
+}
