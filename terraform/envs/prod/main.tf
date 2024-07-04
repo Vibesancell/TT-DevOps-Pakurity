@@ -55,5 +55,5 @@ module "registry" {
   source = "../../modules/registry"
 
   region = local.region
-  repository_id =  "${local.app_name}"
+  repository_id =  "registry"
 }
