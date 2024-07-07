@@ -14,37 +14,39 @@ terraform {
 }
 
 provider "google" {
-  project     = local.project
-  region      = local.region
-  zone        = local.zone
+  project = local.project
+  region  = local.region
+  zone    = local.zone
 }
 
 ###### Create custom modules ######
 module "identity_federation" {
   source = "../../modules/identity_federation"
 
-  project = local.project
+  project    = local.project
   repo_owner = "Vibesancell"
 
   account_id   = "tt-devops-sa"
   display_name = "tt-devops"
   description  = "tt-devops github action role"
-  roles = [ "roles/storage.objectCreator", 
-            "roles/storage.objectViewer",
-            "roles/storage.objectAdmin",
-            "roles/iam.serviceAccountUser",
-            "roles/iam.serviceAccountAdmin",
-            "roles/iam.workloadIdentityPoolAdmin",
-            "roles/iam.workloadIdentityUser"
-          ]
+  roles = ["roles/storage.objectCreator",
+    "roles/storage.objectViewer",
+    "roles/storage.objectAdmin",
+    "roles/iam.serviceAccountUser",
+    "roles/iam.serviceAccountAdmin",
+    "roles/iam.workloadIdentityPoolAdmin",
+    "roles/iam.workloadIdentityUser",
+    "roles/iam.serviceAccountTokenCreator"
+  ]
 }
 
 module "big_query" {
   source = "../../modules/big_query"
 
-  table_id = "${local.environment}_${local.app_name}_table"
-  project_id = local.project
-  dataset_id = "${local.environment}_${local.app_name}_dataset"
-  region = local.region
+  table_id         = "${local.environment}_${local.app_name}_table"
+  project_id       = local.project
+  dataset_id       = "${local.environment}_${local.app_name}_dataset"
+  view_id          = "${local.environment}_${local.app_name}_view"
+  region           = local.region
   dataset_location = "US"
 }

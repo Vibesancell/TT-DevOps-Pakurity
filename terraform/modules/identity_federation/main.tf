@@ -15,7 +15,7 @@ resource "google_iam_workload_identity_pool_provider" "github_actions" {
   display_name                       = "GitHub Actions provider"
   description                        = "Workload Identity Pool Provider managed by Terraform"
   attribute_condition                = "attribute.repository_owner==\"${var.repo_owner}\""
-  attribute_mapping                  = {
+  attribute_mapping = {
     "google.subject"             = "assertion.sub"
     "attribute.actor"            = "assertion.actor"
     "attribute.aud"              = "assertion.aud"
@@ -41,9 +41,24 @@ resource "google_service_account_iam_member" "wif_sa" {
   member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_actions.name}/*"
 }
 
+resource "google_project_iam_member" "sa_iam" {
+  project = var.project
+  role    = "roles/iam.serviceAccountTokenCreator"
+  member  = "serviceAccount:${google_service_account.tt_devops.email}"
+}
+
+
+resource "google_project_iam_binding" "sa_binding" {
+  project = var.project
+  role    = "roles/iam.serviceAccountTokenCreator"
+  members = [
+    "serviceAccount:${google_service_account.tt_devops.email}",
+  ]
+}
+
 resource "google_project_iam_member" "this" {
   for_each = toset(var.roles)
-  project = var.project
-  member  = "serviceAccount:${google_service_account.tt_devops.email}"
-  role    = each.value
+  project  = var.project
+  member   = "serviceAccount:${google_service_account.tt_devops.email}"
+  role     = each.value
 }
