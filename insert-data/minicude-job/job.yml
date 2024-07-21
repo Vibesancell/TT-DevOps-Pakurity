@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tt-devops-job
+  namespace: default
+spec:
+  backoffLimit: 4
+  template:
+    metadata:
+      labels:
+        job-name: tt-devops-job
+    spec:
+      containers:
+      - name: tt-devops
+        image: vibesan/tt-devops:v1
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /root/.config/gcloud
+          name: gcloud-config
+      restartPolicy: Never
+      volumes:
+      - name: gcloud-config
+        hostPath:
+          path: /mnt/gcloud
